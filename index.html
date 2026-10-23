@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Ulangan Harian Bahasa Indonesia – Puisi Rakyat</title>
+<style>
+:root{--bg:#f6f4ef;--sf:#fff;--tx:#1d2a26;--mu:#64706b;--pr:#0f766e;--pt:#fff;--bd:#d9d6cc;--ok:#15803d;--er:#b91c1c;--wa:#b45309;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a18;--sf:#1e2724;--tx:#e8eeeb;--mu:#9aa8a2;--pr:#2dd4bf;--pt:#06241f;--bd:#33403b;--ok:#4ade80;--er:#f87171;--wa:#fbbf24}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.55 Georgia,'Times New Roman',serif;user-select:none;-webkit-user-select:none}
+textarea,input{user-select:text;-webkit-user-select:text}
+.w{max-width:760px;margin:0 auto;padding:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.c{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:14px}
+h1{font-size:24px;margin:0 0 6px}h2{font-size:18px;margin:0 0 10px}
+.mu{color:var(--mu);font-size:14px}
+input,select,textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);margin:4px 0 12px}
+button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:10px 18px;background:var(--pr);color:var(--pt)}
+button.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+button.d{background:var(--er);color:#fff}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;justify-content:space-between;gap:8px;background:var(--sf);border-bottom:1px solid var(--bd);padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));font-size:14px}
+.o{display:block;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;margin:8px 0;cursor:pointer}
+.o:has(input:checked){border-color:var(--pr);background:color-mix(in srgb,var(--pr) 12%,transparent)}
+.o input{width:auto;margin:0 8px 0 0}
+.tx{white-space:pre-line;background:var(--bg);border-left:3px solid var(--pr);padding:10px 14px;margin:10px 0;font-style:italic}
+.nav{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px}
+.nav button{padding:6px 0;background:var(--bg);color:var(--tx);border:1px solid var(--bd);font-size:13px}
+.nav .a{background:var(--pr);color:var(--pt)}.nav .n{outline:2px solid var(--wa)}
+.row{display:flex;justify-content:space-between;gap:8px;margin-top:12px}
+.m{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
+.m>div{background:var(--sf);border-radius:12px;padding:24px;max-width:440px;width:100%}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--bd);color:var(--mu)}
+.big{font-size:44px;font-weight:bold;color:var(--pr)}
+.hide{display:none}
+pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:10px;border-radius:8px;font-size:12px;max-height:120px;overflow:auto;user-select:text}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const TOKEN="PUISI2026",DUR=60,MAX=3,KEY="ulangan_puisi_v1";
+const TAMPIL_KUNCI=false; // true = siswa melihat kunci & pembahasan setelah ujian
+const GURU_PASS="guru2026"; // kata sandi Mode Guru (ganti!)
+const SUARA_VOL=0.6; // volume bip: 0.1 pelan, 0.6 sedang-keras, 1 maksimal
+const SUARA=true; // true = bunyi bip saat pelanggaran, false = senyap
+const SHEET_URL="https://script.google.com/macros/s/AKfycbzNkp8mSPqKgyj-kWNvYNm9BH7qgG1tCJemLjH4fkg2PBpjPkq0LJqurrA8NjedauEH/exec"; // tempel URL Web App Apps Script di sini (berakhiran /exec)
+const $=id=>document.getElementById(id);
+const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+let WL=null;
+async function wake(){try{if(navigator.wakeLock&&S&&S.start&&!S.done&&!WL){WL=await navigator.wakeLock.request('screen');WL.addEventListener('release',()=>{WL=null})}}catch(e){WL=null}}
+function unwake(){try{WL&&WL.release()}catch(e){}WL=null}
+const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const Q=[];
+const pg=(t,o,a)=>Q.push({y:'pg',t,o,a});
+const pk=(t,o,a)=>Q.push({y:'pk',t,o,a});
+const bs=(t,a)=>Q.push({y:'bs',t,a});
+const mt=(t,p,o)=>Q.push({y:'mt',t,p,o});
+const es=(t,k)=>Q.push({y:'es',t,k});
+const PAN="Kalau ada sumur di ladang\nBoleh kita menumpang mandi\nKalau ada umurku panjang\nBoleh kita berjumpa lagi";
+const SYA="Belajarlah giat wahai ananda\nIlmu itu pelita dunia\nHormati guru serta bunda\nAgar hidupmu mulia";
+const GUR="Apabila terpelihara mata\nSedikitlah cita-cita";
+// ===== PILIHAN GANDA (24) =====
+pg("Puisi adalah karya sastra yang…",["terikat rima, irama, dan diksi padat serta bermakna","berupa cerita panjang bersambung","berisi percakapan antartokoh","berupa laporan peristiwa faktual"],0);
+pg("Pilihan kata yang dipakai penyair untuk mengungkapkan gagasan disebut…",["rima","diksi","tipografi","amanat"],1);
+pg("Persamaan bunyi pada akhir baris puisi disebut…",["majas","rima","tema","latar"],1);
+pg("Puisi rakyat adalah puisi lama yang…",["ditulis penyair modern dengan gaya bebas","tumbuh di masyarakat dan diwariskan turun-temurun secara lisan","hanya dibuat untuk lomba di sekolah","berasal dari terjemahan karya asing"],1);
+pg("Salah satu ciri puisi rakyat adalah pengarangnya…",["terkenal dan tercatat","tidak diketahui (anonim)","seorang pejabat","selalu seorang guru"],1);
+pg("Puisi rakyat disebut sastra lisan karena…",["dibacakan di radio","disebarkan dari mulut ke mulut","hanya boleh diucapkan","dicetak dalam buku"],1);
+pg("Yang BUKAN ciri puisi rakyat adalah…",["milik bersama masyarakat","disampaikan secara lisan","terikat aturan baris dan rima","bebas tanpa aturan sama sekali"],3);
+pg("Pantun terdiri atas…",["dua baris","empat baris","enam baris","delapan baris"],1);
+pg("Sampiran pantun terletak pada baris…",["1 dan 2","2 dan 3","3 dan 4","1 dan 4"],0);
+pg("Rima akhir pantun pada umumnya adalah…",["a-a-a-a","a-b-a-b","a-a-b-b","a-b-c-d"],1);
+pg("Puisi rakyat yang terdiri atas dua baris, bersajak a-a, dan berisi nasihat disebut…",["pantun","syair","gurindam","mantra"],2);
+pg("Gurindam: baris pertama berisi syarat, baris kedua berisi…",["sampiran","akibat","judul","latar"],1);
+pg("Puisi rakyat berbentuk empat baris, rima a-a-a-a, dan semua barisnya berisi disebut…",["syair","pantun","gurindam","talibun"],0);
+pg("Perhatikan teks!\n“"+PAN.replace(/\n/g," / ")+"”\nJenis puisi rakyat tersebut adalah…",["gurindam","syair","pantun","karmina"],2);
+pg("Bagian isi pada pantun di atas terdapat pada baris…",["1 dan 2","3 dan 4","1 dan 3","2 dan 4"],1);
+pg("Teks:\n“"+SYA.replace(/\n/g," / ")+"”\nTema syair tersebut adalah…",["persahabatan","pentingnya belajar dan menghormati guru","keindahan alam","perjuangan kemerdekaan"],1);
+pg("Amanat syair di atas adalah…",["hormatilah orang tua dan guru serta rajin menuntut ilmu","jangan pergi ke sekolah","ilmu tidak penting","kejarlah harta dunia"],0);
+pg("Berikut yang termasuk unsur ekstrinsik puisi adalah…",["tema","diksi","nilai budaya masyarakat","rima"],2);
+pg("Makna tersurat adalah makna yang…",["tersembunyi di balik kata","disampaikan langsung dan jelas dalam teks","hanya diketahui penyair","berasal dari tafsir pembaca"],1);
+pg("Makna tersirat pantun “sumur di ladang” adalah…",["ajakan membuat sumur","harapan dapat bertemu kembali bila berumur panjang","larangan mandi di ladang","cara menanam padi"],1);
+pg("Makna tersirat larik “Ilmu itu pelita dunia” adalah…",["ilmu adalah lampu","ilmu menerangi dan menuntun kehidupan","ilmu hanya untuk malam hari","ilmu mudah dicari"],1);
+pg("Makna denotatif adalah makna…",["kiasan","sebenarnya sesuai kamus","tambahan perasaan","yang tidak jelas"],1);
+pg("Kalimat “Ia dikenal berjari panjang” bermakna konotatif, yaitu…",["jarinya panjang","suka mencuri","pandai melukis","pandai memasak"],1);
+pg("Ungkapan “buah hati” bermakna kiasan, yaitu…",["buah yang dimakan","orang yang sangat disayangi, terutama anak","hati yang sehat","orang yang pelit"],1);
+// ===== PILIHAN GANDA KOMPLEKS (6) =====
+pk("Pilih SEMUA ciri puisi rakyat!",["Anonim","Disampaikan secara lisan","Bebas tanpa aturan","Diwariskan turun-temurun","Dibuat individual oleh penyair modern"],[0,1,3]);
+pk("Pilih SEMUA ciri pantun!",["Empat baris","Ada sampiran dan isi","Rima a-b-a-b","Dua baris sebab-akibat","Rima a-a-a-a dan semua isi"],[0,1,2]);
+pk("Pilih SEMUA yang termasuk unsur intrinsik puisi!",["Tema","Amanat","Diksi","Biografi pengarang","Kondisi sosial saat puisi dibuat"],[0,1,2]);
+pk("Pilih SEMUA ciri gurindam!",["Dua baris","Bersajak a-a","Berisi nasihat","Memiliki sampiran","Empat baris"],[0,1,2]);
+pk("Pilih SEMUA ciri syair!",["Empat baris","Rima akhir a-a-a-a","Baris 1–2 sampiran","Semua baris berupa isi"],[0,1,3]);
+pk("Pilih SEMUA kalimat yang bermakna konotatif!",["Ia anak emas guru itu.","Kakek duduk di kursi kayu.","Dia bertangan besi dalam memimpin.","Ibu membeli tali rafia."],[0,2]);
+// ===== BENAR / SALAH (6) =====
+bs("Puisi rakyat bersifat anonim karena pengarangnya tidak diketahui.",true);
+bs("Pada pantun, maksud utama terdapat pada sampiran.",false);
+bs("Gurindam pada umumnya berisi nasihat atau petuah.",true);
+bs("Syair terdiri atas dua baris.",false);
+bs("Makna denotatif adalah makna sebenarnya.",true);
+bs("Latar belakang kehidupan pengarang termasuk unsur intrinsik.",false);
+// ===== MENJODOHKAN (4) =====
+mt("Jodohkan jenis puisi rakyat dengan cirinya!",[["Pantun",0],["Gurindam",1],["Syair",2]],["Empat baris, sampiran dan isi","Dua baris, hubungan sebab-akibat","Empat baris, rima a-a-a-a, semua isi"]);
+mt("Jodohkan unsur intrinsik dengan pengertiannya!",[["Tema",0],["Amanat",1],["Diksi",2]],["Gagasan pokok puisi","Pesan yang ingin disampaikan","Pilihan kata"]);
+mt("Jodohkan ungkapan dengan maknanya!",[["Kambing hitam",0],["Kepala batu",1],["Bunga desa",2]],["Orang yang dipersalahkan","Keras kepala","Gadis tercantik di desa"]);
+mt("Jodohkan jenis makna dengan contohnya!",[["Denotatif",0],["Konotatif",1],["Kiasan",2]],["Air sungai itu sangat jernih.","Ia mata keranjang.","Guru bagaikan lilin yang menerangi."]);
+// ===== ESAI (5) =====
+es("Jelaskan pengertian puisi secara luas dan pengertian puisi rakyat, lalu sebutkan tiga ciri puisi rakyat!","Puisi: karya sastra terikat rima/irama/diksi, bahasa padat & indah. Puisi rakyat: puisi lama, lisan, turun-temurun. Ciri: anonim, lisan, milik bersama, terikat aturan, berisi nasihat/adat.");
+es("Bedakan pantun, gurindam, dan syair berdasarkan jumlah baris, rima, dan isi!","Pantun: 4 baris, a-b-a-b, sampiran+isi. Gurindam: 2 baris, a-a, sebab-akibat/nasihat. Syair: 4 baris, a-a-a-a, semua isi.");
+es("Perhatikan syair berikut!\n"+SYA+"\nAnalisislah tema, amanat, rima, dan diksi syair tersebut!","Tema: pentingnya belajar/hormat guru. Amanat: rajin belajar & hormati guru/orang tua. Rima a-a-a-a. Diksi: pelita (kiasan ilmu), giat, mulia.");
+es("Perhatikan pantun berikut!\n"+PAN+"\nJelaskan makna tersurat dan makna tersirat pantun tersebut!","Tersurat: ada sumur boleh menumpang mandi; bila umur panjang boleh berjumpa lagi. Tersirat: harapan bertemu kembali / ungkapan perpisahan dan doa.");
+es("Jelaskan perbedaan makna denotatif, konotatif, dan kiasan disertai satu contoh kalimat masing-masing!","Denotatif: makna sebenarnya. Konotatif: makna tambahan/perasaan (mis. panjang tangan). Kiasan: perbandingan/ungkapan (mis. bagai pelita). Contoh kalimat benar & sesuai.");
+const NO=Q.filter(q=>q.y!=='es').length;
+const EX=["Puisi terikat rima, irama, dan diksi, dengan bahasa padat dan indah.", "Diksi = pilihan kata; rima = persamaan bunyi; tipografi = tata wajah.", "Rima adalah persamaan bunyi, terutama di akhir baris.", "Puisi rakyat tumbuh di masyarakat dan diwariskan secara lisan turun-temurun.", "Pengarang puisi rakyat tidak diketahui (anonim) karena menjadi milik bersama.", "Disebut sastra lisan karena diturunkan dari mulut ke mulut.", "Puisi rakyat terikat aturan (baris, rima), jadi bukan “bebas tanpa aturan”.", "Pantun terdiri atas empat baris.", "Baris 1–2 adalah sampiran (pengantar); baris 3–4 adalah isi.", "Pantun berima akhir a-b-a-b.", "Gurindam: dua baris, bersajak a-a, berisi nasihat.", "Baris pertama gurindam berisi syarat/sebab, baris kedua berisi akibat.", "Syair: empat baris, rima a-a-a-a, semua baris berisi.", "Empat baris, ada sampiran dan isi, rima a-b-a-b: ciri pantun.", "Isi pantun berada di baris 3 dan 4.", "Syair menekankan pentingnya belajar dan hormat kepada guru.", "Amanat: rajin belajar serta menghormati guru dan orang tua.", "Unsur ekstrinsik berasal dari luar teks, misalnya nilai budaya. Tema, diksi, rima = intrinsik.", "Makna tersurat tertulis langsung dan jelas dalam teks.", "Makna tersirat: harapan dapat bertemu lagi jika berumur panjang.", "Pelita = penerang; ilmu menerangi dan menuntun kehidupan.", "Makna denotatif adalah makna sebenarnya (sesuai kamus).", "“Berjari/panjang tangan” = suka mencuri (konotatif).", "“Buah hati” adalah kiasan untuk orang yang sangat disayangi, biasanya anak.", "Ciri puisi rakyat: anonim, lisan, turun-temurun. Bukan “bebas” atau buatan individu modern.", "Pantun: empat baris, sampiran–isi, a-b-a-b. Sebab-akibat = gurindam; a-a-a-a = syair.", "Intrinsik: tema, amanat, diksi. Biografi dan kondisi sosial = ekstrinsik.", "Gurindam: dua baris, bersajak a-a, berisi nasihat; tidak bersampiran.", "Syair: empat baris, a-a-a-a, semua baris isi. Sampiran adalah ciri pantun.", "“Anak emas” dan “bertangan besi” bermakna kiasan; kalimat lain bermakna sebenarnya.", "Benar. Anonim berarti pengarangnya tidak diketahui.", "Salah. Maksud utama ada pada isi (baris 3–4), bukan sampiran.", "Benar. Gurindam berisi nasihat atau petuah.", "Salah. Syair empat baris; dua baris adalah gurindam.", "Benar. Denotatif = makna sebenarnya.", "Salah. Latar belakang pengarang termasuk unsur ekstrinsik.", "Pantun: 4 baris sampiran–isi. Gurindam: 2 baris sebab-akibat. Syair: a-a-a-a semua isi.", "Tema = gagasan pokok; amanat = pesan; diksi = pilihan kata.", "Kambing hitam = orang yang disalahkan; kepala batu = keras kepala; bunga desa = gadis tercantik.", "Denotatif = sebenarnya; konotatif = bernilai rasa (mata keranjang); kiasan = perbandingan (bagaikan)."];
+const TY={pg:'Pilihan Ganda',pk:'Pilihan Ganda Kompleks',bs:'Benar / Salah',mt:'Menjodohkan',es:'Esai'};
+let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const app=$('app');let timer,last=0,devo=false,locked=false;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function login(msg){
+ app.innerHTML=`<div class="w"><div class="c"><h1>Ulangan Harian Bahasa Indonesia</h1><div class="mu">Materi: Puisi Rakyat · 45 soal (40 objektif + 5 esai) · ${DUR} menit</div></div>
+ <div class="c"><h2>Aturan Ujian</h2><div class="mu">• Ujian berjalan dalam layar penuh.<br>• Berpindah tab/aplikasi, keluar layar penuh, menyalin/menempel, membuka DevTools, dan memuat ulang halaman dicatat sebagai pelanggaran.<br>• ${MAX} pelanggaran = ujian otomatis dikumpulkan.<br>• Urutan soal dan pilihan jawaban diacak untuk setiap siswa.</div></div>
+ <div class="c"><h2>Masuk</h2>${msg?`<div style="color:var(--er)">${msg}</div>`:''}
+ <label>Nama lengkap<input id="nm" autocomplete="off"></label><label>Kelas<input id="kl" placeholder="mis. X-3" autocomplete="off"></label><label>Token ujian (dari guru)<input id="tk" autocomplete="off"></label>
+ <button onclick="begin()">Mulai Ujian</button> <button class="g" onclick="teacher()">Mode Guru</button></div></div>`;
+}
+function begin(){
+ const nm=$('nm').value.trim(),kl=$('kl').value.trim(),tk=$('tk').value.trim();
+ if(!nm||!kl)return login('Nama dan kelas wajib diisi.');
+ if(tk.toUpperCase()!==TOKEN)return login('Token ujian salah.');
+ const g={};Q.forEach((q,i)=>(g[q.y]=g[q.y]||[]).push(i));
+ const order=[].concat(...Object.keys(g).map(k=>sh(g[k])));
+ const perm=Q.map(q=>q.o?sh(q.o.map((_,i)=>i)):null);
+ S={nm,kl,order,perm,ans:{},viol:[],i:0,start:Date.now(),done:false,nodes:0};save();
+ audioInit();fs();run();
+}
+let AC=null;
+function audioInit(){if(!SUARA)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}}
+function bip(n){
+ if(!SUARA||!AC)return;
+ try{const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime,d=n===2?1.2:0.5;
+  o.type='square';o.frequency.value=n===2?440:880;
+  g.gain.setValueAtTime(SUARA_VOL,t);g.gain.exponentialRampToValueAtTime(0.001,t+d);
+  o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d)}catch(e){}
+}
+function fs(){wake();try{const e=document.documentElement;e.requestFullscreen&&e.requestFullscreen()}catch(e){}}
+function run(){
+ app.innerHTML=`<div class="top"><b id="who"></b><span id="tm"></span><span id="vc"></span></div><div class="w"><div class="c" id="qa"></div><div class="c"><div class="mu" style="margin-bottom:8px">Navigasi soal (kuning = soal sekarang, hijau = terjawab)</div><div class="nav" id="nv"></div><div class="row"><span></span><button class="d" onclick="ask()">Kumpulkan Ujian</button></div></div></div>`;
+ $('who').textContent=S.nm+' · '+S.kl;draw();tick();clearInterval(timer);timer=setInterval(tick,1000);
+}
+function tick(){
+ const left=S.start+DUR*60000-Date.now();if(left<=0)return finish('Waktu habis');
+ const m=Math.floor(left/60000),s=Math.floor(left/1000)%60;
+ $('tm').textContent='⏱ '+m+':'+String(s).padStart(2,'0');
+ $('vc').textContent='⚠ '+S.viol.filter(v=>!v.s).length+'/'+MAX;
+ if(!IOS&&!S.done&&!devo&&(outerWidth-innerWidth>220||outerHeight-innerHeight>220)){devo=true;v('Indikasi DevTools / layar terbagi')}
+ else if(outerWidth-innerWidth<=220&&outerHeight-innerHeight<=220)devo=false;
+}
+const ok=i=>{const q=Q[i],a=S.ans[i];if(q.y==='mt')return a&&q.p.every((_,j)=>a[j]!==undefined&&a[j]!=='');if(q.y==='pk')return a&&a.length;if(q.y==='es')return a&&a.trim().length>0;return a!==undefined};
+function draw(){
+ const qi=S.order[S.i],q=Q[qi],a=S.ans[qi];let h=`<span class="tag">${TY[q.y]}</span> <span class="mu">Soal ${S.i+1} dari ${Q.length}</span><p style="white-space:pre-line;margin-top:12px">${esc(q.t)}</p>`;
+ if(q.y==='pg')h+=S.perm[qi].map(p=>`<label class="o"><input type="radio" name="r" ${a===p?'checked':''} onchange="set(${qi},${p})">${esc(q.o[p])}</label>`).join('');
+ if(q.y==='pk')h+=`<div class="mu">Boleh memilih lebih dari satu.</div>`+S.perm[qi].map(p=>`<label class="o"><input type="checkbox" ${a&&a.includes(p)?'checked':''} onchange="tog(${qi},${p})">${esc(q.o[p])}</label>`).join('');
+ if(q.y==='bs')h+=[[true,'Benar'],[false,'Salah']].map(([v,l])=>`<label class="o"><input type="radio" name="r" ${a===v?'checked':''} onchange="set(${qi},${v})">${l}</label>`).join('');
+ if(q.y==='mt')h+=q.p.map((p,j)=>`<div style="margin-top:10px"><b>${esc(p[0])}</b><select onchange="mset(${qi},${j},this.value)"><option value="">— pilih —</option>${S.perm[qi].map(k=>`<option value="${k}" ${a&&a[j]==k&&a[j]!==''?'selected':''}>${esc(q.o[k])}</option>`).join('')}</select></div>`).join('');
+ if(q.y==='es')h+=`<textarea rows="7" placeholder="Tulis jawaban esai di sini…" oninput="set(${qi},this.value,1)">${esc(a||'')}</textarea>`;
+ h+=`<div class="row"><button class="g" ${S.i?'':'disabled'} onclick="go(-1)">← Sebelumnya</button><button onclick="go(1)" ${S.i<Q.length-1?'':'disabled'}>Berikutnya →</button></div>`;
+ $('qa').innerHTML=h;nav();
+}
+function nav(){$('nv').innerHTML=S.order.map((qi,n)=>`<button class="${ok(qi)?'a':''} ${n===S.i?'n':''}" onclick="S.i=${n};save();draw()">${n+1}</button>`).join('')}
+function set(qi,val,soft){S.ans[qi]=val;save();if(!soft||true)nav()}
+function tog(qi,p){const a=S.ans[qi]||[];S.ans[qi]=a.includes(p)?a.filter(x=>x!==p):a.concat(p);save();nav()}
+function mset(qi,j,val){const a=S.ans[qi]||[];a[j]=val;S.ans[qi]=a;save();nav()}
+function go(d){S.i+=d;save();draw();scrollTo(0,0)}
+function modal(h){let m=$('md');if(!m){m=document.createElement('div');m.id='md';m.className='m';document.body.appendChild(m)}m.innerHTML='<div>'+h+'</div>'}
+function closeM(){const m=$('md');m&&m.remove()}
+function ask(){const n=Q.filter((_,i)=>!ok(i)).length;modal(`<h2>Kumpulkan ujian?</h2><p>${n?`Masih ada <b>${n}</b> soal belum terjawab.`:'Semua soal sudah terjawab.'} Jawaban tidak dapat diubah setelah dikumpulkan.</p><div class="row"><button class="g" onclick="closeM()">Kembali</button><button class="d" onclick="finish('Dikumpulkan siswa')">Ya, kumpulkan</button></div>`)}
+// ===== DETEKSI KECURANGAN =====
+function v(msg,soft){
+ if(!S||S.done||!S.start||locked)return;
+ const now=Date.now();if(now-last<2000)return;last=now;
+ S.viol.push({t:new Date().toLocaleTimeString('id-ID'),m:(IOS?'[iPhone/iPad] ':'')+msg,s:soft?1:0});save();
+ if(soft){return}
+ const c=S.viol.filter(x=>!x.s).length;
+ bip(c>=MAX?2:1);
+ if(c>=MAX)return finish('Melebihi batas pelanggaran');
+ locked=true;modal(`<h2 style="color:var(--er)">⚠ Pelanggaran terdeteksi</h2><p>${esc(msg)}</p><p>Pelanggaran <b>${c} dari ${MAX}</b>. Pada pelanggaran ke-${MAX} ujian otomatis dikumpulkan dan dilaporkan ke guru.</p><button onclick="locked=false;closeM();audioInit();fs();last=Date.now()">Kembali ke ujian</button>`);
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)v('Berpindah tab / aplikasi');else wake()});
+addEventListener('blur',()=>setTimeout(()=>{if(!IOS&&!document.hasFocus()&&!document.hidden)v('Jendela ujian kehilangan fokus')},150));
+document.addEventListener('fullscreenchange',()=>{if(S&&!S.done&&S.start&&!document.fullscreenElement&&document.documentElement.requestFullscreen)v('Keluar dari layar penuh')});
+['copy','cut','paste','dragstart'].forEach(e=>document.addEventListener(e,x=>{if(S&&!S.done){x.preventDefault();v('Mencoba '+(e==='paste'?'menempel':'menyalin')+' teks')}}));
+document.addEventListener('contextmenu',x=>{if(S&&!S.done){x.preventDefault();v('Klik kanan',1)}});
+document.addEventListener('keydown',e=>{
+ if(!S||S.done)return;const k=e.key.toLowerCase(),c=e.ctrlKey||e.metaKey;
+ if(k==='f12'||(c&&e.shiftKey&&['i','j','c'].includes(k))||(c&&['u','s','p','a','c','v','x','f'].includes(k))||k==='printscreen'||(e.altKey&&k==='tab')){
+  e.preventDefault();v('Pintasan terlarang: '+(c?'Ctrl+':'')+e.key,1);if(k==='printscreen'||k==='f12'||(c&&e.shiftKey))v('Mencoba tangkap layar / DevTools')}
+});
+addEventListener('beforeunload',e=>{if(S&&S.start&&!S.done){e.preventDefault();e.returnValue=''}});
+// ===== PENILAIAN =====
+function qs(i){const q=Q[i],a=S.ans[i];if(a===undefined)return 0;
+ if(q.y==='pg'||q.y==='bs')return a===q.a?1:0;
+ if(q.y==='pk')return [...a].sort().join()===q.a.join()?1:0;
+ if(q.y==='mt')return q.p.filter((p,j)=>a[j]!==''&&a[j]!==undefined&&+a[j]===p[1]).length/q.p.length;
+ return 0}
+function score(){let t=0;for(let i=0;i<NO;i++)t+=qs(i);return t}
+function finish(why){
+ if(S.done)return;unwake();S.done=true;S.end=Date.now();S.why=why;S.sc=score();save();clearInterval(timer);closeM();locked=false;
+ try{document.fullscreenElement&&document.exitFullscreen()}catch(e){}
+ result();kirim();
+}
+async function kirim(){
+ const el=$('st'),say=t=>{const e=$('st');if(e)e.textContent=t};
+ if(!SHEET_URL)return say('Pengiriman otomatis belum diaktifkan. Kirim kode laporan ke guru.');
+ try{say('Mengirim hasil ke guru…');
+  const r=JSON.parse(decodeURIComponent(escape(atob(report()))));
+  await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(r)});
+  S.sent=1;save();say('✓ Hasil sudah dikirim ke guru.');
+ }catch(e){say('Gagal mengirim. Periksa koneksi lalu tekan “Kirim ulang”, atau kirim kode laporan ke guru.')}
+}
+function report(){
+ const r={id:S.start,d:Array.from({length:NO},(_,i)=>+qs(i).toFixed(2)),n:S.nm,k:S.kl,sc:+S.sc.toFixed(2),w:Math.round((S.end-S.start)/60000),why:S.why,v:S.viol,es:Q.map((q,i)=>q.y==='es'?(S.ans[i]||''):null).filter(x=>x!==null)};
+ return btoa(unescape(encodeURIComponent(JSON.stringify(r))))}
+function result(){
+ const c=S.viol.filter(x=>!x.s).length,code=report();
+ app.innerHTML=`<div class="w"><div class="c"><h1>Ujian selesai</h1><div class="mu">${esc(S.nm)} · ${esc(S.kl)} · ${esc(S.why)}</div><p>Skor pilihan (40 soal objektif):</p><div class="big">${(S.sc/NO*100).toFixed(0)}<span class="mu">/100</span></div><p class="mu">Esai (5 soal) dinilai oleh guru. Pelanggaran tercatat: ${c}, catatan ringan: ${S.viol.length-c}.</p></div>
+ <div class="c"><h2>Pengiriman ke guru</h2><p id="st" class="mu"></p><button class="g" onclick="kirim()">Kirim ulang</button><h2 style="margin-top:18px">Kode laporan (cadangan)</h2><p class="mu">Salin kode ini dan kirim ke guru (chat/LMS). Berisi skor, jawaban esai, dan log pelanggaran.</p><pre id="cd">${code}</pre><button onclick="navigator.clipboard&&navigator.clipboard.writeText($('cd').textContent).then(()=>this.textContent='Tersalin ✓')">Salin kode</button> <button class="g" onclick="localStorage.removeItem(KEY);S=null;login()">Keluar</button></div>${TAMPIL_KUNCI?`<h2 style="margin:18px 0 8px">Pembahasan</h2>`+Array.from({length:NO},(_,i)=>item(i,true)).join(''):''}</div>`;
+}
+// ===== PEMBAHASAN =====
+function tx(i,a){const q=Q[i];
+ if(a===undefined||a===null||a==='')return '(kosong)';
+ if(q.y==='pg')return q.o[a];
+ if(q.y==='pk')return a.length?a.map(x=>q.o[x]).join('; '):'(kosong)';
+ if(q.y==='bs')return a?'Benar':'Salah';
+ return q.p.map((p,j)=>p[0]+' → '+(a[j]===undefined||a[j]===''?'?':q.o[a[j]])).join(' | ')}
+const KV=i=>Q[i].y==='mt'?Q[i].p.map(p=>p[1]):Q[i].a;
+function item(i,own){const q=Q[i],sc=own?qs(i):0;
+ const st=!own?'':sc===1?'<span style="color:var(--ok)">✓ Benar</span>':sc>0?'<span style="color:var(--wa)">◐ Sebagian</span>':'<span style="color:var(--er)">✗ Salah</span>';
+ return `<div class="c"><b>No. ${i+1}</b> ${st}<p style="white-space:pre-line">${esc(q.t)}</p>${own?`<div class="mu">Jawabanmu: ${esc(tx(i,S.ans[i]))}</div>`:''}<div class="mu">Kunci: <b>${esc(tx(i,KV(i)))}</b></div><div class="mu">${esc(EX[i])}</div></div>`}
+// ===== MODE GURU =====
+function teacher(){app.innerHTML=`<div class="w"><div class="c"><h1>Mode Guru</h1><label>Kata sandi guru<input id="pw" type="password" autocomplete="off"></label><button onclick="cekGuru()">Masuk</button> <button class="g" onclick="S?result():login()">Kembali</button><p id="er" style="color:var(--er)"></p></div></div>`}
+function cekGuru(){if($('pw').value!==GURU_PASS)return $('er').textContent='Kata sandi salah.';guruUI()}
+function guruUI(){app.innerHTML=`<div class="w"><div class="c"><h1>Mode Guru</h1><p class="mu">Tempel kode laporan siswa untuk melihat skor, log kecurangan, soal yang salah, dan jawaban esai.</p><textarea id="cd" rows="5" placeholder="Tempel kode laporan…"></textarea><button onclick="decode()">Tampilkan</button> <button class="g" onclick="kunci()">Kunci &amp; nomor soal</button> <button class="g" onclick="S?result():login()">Keluar</button><div id="rp"></div></div></div>`}
+function kunci(){$('rp').innerHTML='<hr><h2>Kunci &amp; pembahasan (No. 1–'+NO+')</h2>'+Array.from({length:NO},(_,i)=>item(i,false)).join('')+'<h2>Kunci esai</h2>'+Q.map((q,i)=>q.y==='es'?`<div class="c"><b>No. ${i+1}</b><p style="white-space:pre-line">${esc(q.t)}</p><div class="mu">Kunci: ${esc(q.k)}</div></div>`:'').join('')}
+function decode(){
+ try{const r=JSON.parse(decodeURIComponent(escape(atob($('cd').value.trim()))));
+  const c=r.v.filter(x=>!x.s).length,st=c>=MAX?['Dicurigai berat','var(--er)']:c>0?['Perlu ditinjau','var(--wa)']:['Aman','var(--ok)'];
+  const key=Q.filter(q=>q.y==='es').map(q=>q.k);
+  const sl=(r.d||[]).map((x,i)=>x<1?(i+1)+(x>0?' (sebagian)':''):null).filter(Boolean);
+  $('rp').innerHTML=`<hr><h2>${esc(r.n)} · ${esc(r.k)}</h2><p>Skor objektif: <b>${(r.sc/NO*100).toFixed(0)}/100</b> · Durasi: ${r.w} menit · ${esc(r.why)}<br>Status: <b style="color:${st[1]}">${st[0]}</b> (${c} pelanggaran, ${r.v.length-c} catatan ringan)</p>
+  <p>Soal salah / kurang: <b>${sl.length?sl.join(', '):'tidak ada'}</b></p>
+  <h2>Log pelanggaran</h2>${r.v.length?r.v.map(x=>`<div class="mu">${x.t} — ${esc(x.m)} ${x.s?'(ringan)':''}</div>`).join(''):'<div class="mu">Tidak ada.</div>'}
+  <h2 style="margin-top:14px">Jawaban esai</h2>${r.es.map((a,i)=>`<div class="c"><b>Esai ${i+1}</b><p style="white-space:pre-wrap">${esc(a||'(kosong)')}</p><div class="mu">Kunci: ${esc(key[i])}</div></div>`).join('')}`;
+ }catch(e){$('rp').innerHTML='<p style="color:var(--er)">Kode tidak valid.</p>'}
+}
+// ===== MULAI =====
+if(S&&S.done){result();if(!S.sent)kirim()}
+else if(S&&S.start){S.viol.push({t:new Date().toLocaleTimeString('id-ID'),m:'Halaman dimuat ulang / ditutup saat ujian',s:0});save();
+ if(S.viol.filter(x=>!x.s).length>=MAX)finish('Melebihi batas pelanggaran');
+ else{run();locked=true;modal(`<h2 style="color:var(--er)">⚠ Halaman dimuat ulang</h2><p>Ini dicatat sebagai pelanggaran (${S.viol.filter(x=>!x.s).length}/${MAX}). Waktu ujian tetap berjalan.</p><button onclick="locked=false;closeM();audioInit();fs();last=Date.now()">Lanjutkan ujian</button>`)}}
+else login();
+</script>
+</body>
+</html>
